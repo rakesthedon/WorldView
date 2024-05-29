@@ -24,6 +24,7 @@ final class CountryDetailsViewModel: ObservableObject {
     var coordinates: CLLocationCoordinate2D { .init(latitude: country.coordinates.latitude, longitude: country.coordinates.longitude) }
 
     @Published private(set) var region: CLCircularRegion?
+    @Published private(set) var placemark: MKPlacemark?
     @Published private(set) var flag: UIImage?
 
     private var flagCancellable: AnyCancellable?
@@ -47,8 +48,11 @@ final class CountryDetailsViewModel: ObservableObject {
 
         MKLocalSearch(request: request).start { response, error in
             // TODO: If error != nil, Log Error and Return
-            guard let region = response?.mapItems.first?.placemark.region as? CLCircularRegion else { return }
-            
+            guard
+                let placemark = response?.mapItems.first?.placemark,
+                let region = placemark.region as? CLCircularRegion
+            else { return }
+            self.placemark = placemark
             self.region = region
         }
     }

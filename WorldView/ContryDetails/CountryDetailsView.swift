@@ -56,16 +56,20 @@ struct CountryDetailsView: View {
 
     @ViewBuilder
     private var map: some View {
-        if let region = viewModel.region {
-            Map(bounds: .init(centerCoordinateBounds: .init(center: region.center, span: .init()))) {
-                MapCircle(.init(center: region.center, radius: region.radius))
+        if let placemark = viewModel.placemark, let region = viewModel.region {
+            Map(bounds: .init(
+                centerCoordinateBounds: .init(center: placemark.coordinate, span: .init()))) {
+                    MapCircle(
+                        .init(
+                            center: placemark.coordinate,
+                            radius: region.radius))
                     .foregroundStyle(.clear)
-                Marker(viewModel.markerTitle, coordinate: region.center)
-            }
-            .disabled(true)
-            .mapControlVisibility(.hidden)
-            .frame(height: 300)
-            .modifier(SectionShapeModifier())
+                    Marker(viewModel.markerTitle, coordinate: placemark.coordinate)
+                }
+                .disabled(true)
+                .mapControlVisibility(.hidden)
+                .frame(height: 300)
+                .modifier(SectionShapeModifier())
         }
     }
 }
