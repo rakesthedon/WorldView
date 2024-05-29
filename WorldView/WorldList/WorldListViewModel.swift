@@ -28,7 +28,11 @@ final class WorldListViewModel: ObservableObject {
         await endLoading()
     }
 
-    func performRequest() async {
+    func viewModel(for country: Country?) -> CountryListItemViewModel? {
+        return CountryListItemViewModel(country: country)
+    }
+
+    private func performRequest() async {
         do {
             let countries = try await client.fetchCountries()
             await set(countries: countries)
