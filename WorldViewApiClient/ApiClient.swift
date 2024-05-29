@@ -14,6 +14,7 @@ public protocol ApiClient: AnyObject {
 
 public enum ApiError: Error, Equatable {
 
+    case invalidConfiguration
     case decodingFailed
     case requestFailed(error: Error)
 

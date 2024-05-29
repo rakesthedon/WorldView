@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import WorldViewCoreKit
 
 struct CountryList: View {
 
     @ObservedObject var viewModel: CountryListViewModel
+    @State var selectedCountry: Country?
 
     var body: some View {
         NavigationView {
@@ -37,7 +39,11 @@ struct CountryList: View {
 
     private var list: some View {
         List(viewModel.countries) { country in
-            CountryListItemView(viewModel: viewModel.viewModel(for: country))
+            NavigationLink {
+                CountryDetailsView(viewModel: viewModel.detailViewModel(for: country))
+            } label: {
+                CountryListItemView(viewModel: viewModel.viewModel(for: country))
+            }
         }
     }
 

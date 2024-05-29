@@ -16,10 +16,12 @@ final class CountryListViewModel: ObservableObject {
     @Published private(set) var error: Error?
 
     private let client: any ApiClient
+    private let formatter: PopulationCountFormatter
 
-    init(countries: [Country] = [], apiClient: any ApiClient) {
+    init(countries: [Country] = [], apiClient: any ApiClient, formatter: PopulationCountFormatter = .init()) {
         self.countries = countries
         self.client = apiClient
+        self.formatter = formatter
     }
 
     func fetchCountries() async {
@@ -32,10 +34,16 @@ final class CountryListViewModel: ObservableObject {
         return CountryListItemViewModel(country: country)
     }
 
+    func detailViewModel(for country: Country?) -> CountryDetailsViewModel? {
+        return CountryDetailsViewModel(country: country, formatter: formatter)
+    }
+
     private func performRequest() async {
         do {
             let countries = try await client.fetchCountries()
-            await set(countries: countries)
+            await set(countries: countries.sorted(by: { first, second in
+                first.name.compare(second.name) == .orderedAscending
+            }))
         } catch {
             await handle(error: error)
         }

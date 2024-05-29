@@ -12,7 +12,7 @@ import WorldViewCoreKit
 struct WorldViewApp: App {
     var body: some Scene {
         WindowGroup {
-            CountryDetailsView(viewModel: .init(country: PreviewCountries.france, formatter: PopulationCountFormatter()))
+            CountryList(viewModel: .init(apiClient: RemoteApiClient(), formatter: PopulationCountFormatter()))
         }
     }
 }

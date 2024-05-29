@@ -20,9 +20,6 @@ struct CountryDetailsView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(viewModel.name)
-                .font(.largeTitle.bold())
-                .padding(.horizontal)
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 24) {
 
@@ -50,6 +47,8 @@ struct CountryDetailsView: View {
                 .padding()
             }
         }
+        .navigationTitle(viewModel.name)
+        .toolbarTitleDisplayMode(.inlineLarge)
         .onAppear {
             viewModel.fetchCountryInformations()
         }
