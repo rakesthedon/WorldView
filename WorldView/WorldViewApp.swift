@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import WorldViewCoreKit
 
 @main
 struct WorldViewApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("")
+            CountryDetailsView(viewModel: .init(country: PreviewCountries.france, formatter: PopulationCountFormatter()))
         }
     }
 }

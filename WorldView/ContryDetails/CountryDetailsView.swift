@@ -26,6 +26,13 @@ struct CountryDetailsView: View {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 24) {
 
+                    if let flag = viewModel.flag {
+                        Image(uiImage: flag)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .modifier(SectionShapeModifier())
+                    }
+
                     VStack(spacing: 20) {
                         LineItemWithDetail(title: "Population", value: viewModel.population)
                         LineItemWithDetail(title: "Continent", value: viewModel.continents)
@@ -44,7 +51,7 @@ struct CountryDetailsView: View {
             }
         }
         .onAppear {
-            viewModel.searchCountryRegion()
+            viewModel.fetchCountryInformations()
         }
     }
 

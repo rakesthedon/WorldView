@@ -8,6 +8,7 @@
 import UIKit
 import CoreLocation
 import WorldViewCoreKit
+import Combine
 import MapKit
 
 final class CountryDetailsViewModel: ObservableObject {
@@ -23,7 +24,9 @@ final class CountryDetailsViewModel: ObservableObject {
     var coordinates: CLLocationCoordinate2D { .init(latitude: country.coordinates.latitude, longitude: country.coordinates.longitude) }
 
     @Published private(set) var region: CLCircularRegion?
+    @Published private(set) var flag: UIImage?
 
+    private var flagCancellable: AnyCancellable?
     private let country: Country
     private let formatter: PopulationCountFormatter
 
@@ -32,8 +35,13 @@ final class CountryDetailsViewModel: ObservableObject {
         self.country = country
         self.formatter = formatter
     }
-    
-    func searchCountryRegion() {
+
+    func fetchCountryInformations() {
+        searchCountryRegion()
+        fetchFlag()
+    }
+
+    private func searchCountryRegion() {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = name
 
@@ -43,5 +51,18 @@ final class CountryDetailsViewModel: ObservableObject {
             
             self.region = region
         }
+    }
+
+    private func fetchFlag() {
+        flagCancellable = URLSession
+            .shared
+            .dataTaskPublisher(for: flagUrl)
+            .compactMap { data, _ in return data }
+            .map { UIImage(data: $0) }
+            .replaceError(with: nil)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] flag in
+                self?.flag = flag
+            }
     }
 }
