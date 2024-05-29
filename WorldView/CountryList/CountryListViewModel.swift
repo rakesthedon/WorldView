@@ -11,6 +11,20 @@ import WorldViewApiClient
 
 final class CountryListViewModel: ObservableObject {
 
+    @Published var search: String = ""
+
+    var filteredCountryList: [Country] {
+        let searchTerm = search.trimmingCharacters(in: .whitespacesAndNewlines)
+        return searchTerm.isEmpty ?
+        countries :
+        countries.filter { country in
+            country.name.localizedCaseInsensitiveContains(searchTerm) ||
+            country.capitals.contains { capital in
+                capital.localizedCaseInsensitiveContains(searchTerm)
+            }
+        }
+    }
+
     @Published private(set) var loading: Bool = false
     @Published private(set) var countries: [Country]
     @Published private(set) var error: Error?

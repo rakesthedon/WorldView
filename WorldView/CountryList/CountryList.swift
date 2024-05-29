@@ -38,13 +38,15 @@ struct CountryList: View {
     }
 
     private var list: some View {
-        List(viewModel.countries) { country in
+        List(viewModel.filteredCountryList) { country in
             NavigationLink {
                 CountryDetailsView(viewModel: viewModel.detailViewModel(for: country))
             } label: {
                 CountryListItemView(viewModel: viewModel.viewModel(for: country))
             }
         }
+        .navigationTitle("Contry List")
+        .searchable(text: $viewModel.search)
     }
 
     private func emptyStateView(title: String, message: String) -> some View {
@@ -71,7 +73,11 @@ struct CountryList: View {
     }
 
     private var loadingIndicator: some View {
-        ProgressView()
+        VStack(spacing: 8) {
+            ProgressView()
+            Text("Loading in progress")
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
