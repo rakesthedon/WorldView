@@ -25,7 +25,7 @@ final class CountryListViewModel: ObservableObject {
         }
     }
 
-    @Published private(set) var loading: Bool = false
+    @Published private(set) var loading: Bool = true
     @Published private(set) var countries: [Country]
     @Published private(set) var error: Error?
 
