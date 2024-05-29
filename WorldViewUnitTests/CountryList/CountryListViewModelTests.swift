@@ -1,5 +1,5 @@
 //
-//  WordListViewModelTests.swift
+//  CountryListViewModelTests.swift
 //  WorldViewUnitTests
 //
 //  Created by Yannick Jacques on 2024-05-28.
@@ -11,10 +11,10 @@ import XCTest
 import WorldViewCoreKit
 import WorldViewApiClient
 
-final class WordListViewModelTests: XCTestCase {
+final class CountryListViewModelTests: XCTestCase {
 
     func testWhenApiClientReturnsCountriesThenTheViewModelCountryListIsPopulated() async {
-        let viewModel = WorldListViewModel(apiClient: CountriesPreviewApiClient())
+        let viewModel = CountryListViewModel(apiClient: CountriesPreviewApiClient())
         XCTAssertTrue(viewModel.countries.count == 0)
 
         await viewModel.fetchCountries()
@@ -25,7 +25,7 @@ final class WordListViewModelTests: XCTestCase {
 
     func testWhenApiClientThrowsAnErrorThenTheViewModelSaveThatError() async {
         let client = ForcedFailureApiClient(error: .decodingFailed)
-        let viewModel = WorldListViewModel(apiClient: client)
+        let viewModel = CountryListViewModel(apiClient: client)
         XCTAssertNil(viewModel.error)
         
         await viewModel.fetchCountries()
@@ -34,5 +34,18 @@ final class WordListViewModelTests: XCTestCase {
         let apiError = viewModel.error as! ApiError
         XCTAssertEqual(apiError, client.error)
         XCTAssertFalse(viewModel.loading)
+    }
+
+    func testGivenACountryWhenCallViewModelForCountryThenTheCorrectViewModelIsReturned() {
+        let listViewModel = CountryListViewModel(apiClient: CountriesPreviewApiClient())
+        let expectedViewModel = CountryListItemViewModel(country: PreviewCountries.france)!
+
+        guard let viewModel = listViewModel.viewModel(for: PreviewCountries.france) else {
+            XCTFail("ViewModel cannot be nil")
+            return
+        }
+
+        XCTAssertEqual(viewModel.title, expectedViewModel.title)
+        XCTAssertEqual(viewModel.subTitle, expectedViewModel.subTitle)
     }
 }

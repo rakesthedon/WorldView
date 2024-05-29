@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  CountryList.swift
 //  WorldView
 //
 //  Created by Yannick Jacques on 2024-05-28.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct WorldList: View {
+struct CountryList: View {
 
-    @ObservedObject var viewModel: WorldListViewModel
+    @ObservedObject var viewModel: CountryListViewModel
 
     var body: some View {
         NavigationView {
@@ -37,7 +37,7 @@ struct WorldList: View {
 
     private var list: some View {
         List(viewModel.countries) { country in
-            Text(country.name)
+            CountryListItemView(viewModel: viewModel.viewModel(for: country))
         }
     }
 
@@ -70,18 +70,18 @@ struct WorldList: View {
 }
 
 #Preview {
-    WorldList(viewModel: WorldListViewModel(apiClient: CountriesPreviewApiClient()))
+    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient()))
 }
 
 #Preview {
-    WorldList(viewModel: WorldListViewModel(apiClient: CountriesPreviewApiClient(countries: [])))
+    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(countries: [])))
 }
 
 
 #Preview {
-    WorldList(viewModel: WorldListViewModel(apiClient: CountriesPreviewApiClient(delay: 3600)))
+    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(delay: 3600)))
 }
 
 #Preview {
-    WorldList(viewModel: WorldListViewModel(apiClient: ForcedFailureApiClient(error: .decodingFailed)))
+    CountryList(viewModel: CountryListViewModel(apiClient: ForcedFailureApiClient(error: .decodingFailed)))
 }

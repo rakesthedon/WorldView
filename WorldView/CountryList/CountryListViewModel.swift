@@ -1,5 +1,5 @@
 //
-//  WorldListViewModel.swift
+//  CountryListViewModel.swift
 //  WorldView
 //
 //  Created by Yannick Jacques on 2024-05-28.
@@ -9,7 +9,7 @@ import Foundation
 import WorldViewCoreKit
 import WorldViewApiClient
 
-final class WorldListViewModel: ObservableObject {
+final class CountryListViewModel: ObservableObject {
 
     @Published private(set) var loading: Bool = false
     @Published private(set) var countries: [Country]
