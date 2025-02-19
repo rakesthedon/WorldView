@@ -7,19 +7,24 @@
 
 import Foundation
 import WorldViewCoreKit
-import WorldViewApiClient
 
-final class RemoteApiClient: ApiClient {
+public final class RemoteApiClient: ApiClient {
 
     static var url: URL? { URL(string: "https://restcountries.com/v3.1/all") }
 
-    private let decoder = JSONDecoder()
+    private let decoder: JSONDecoder
+    private let urlSession: URLSession
 
-    func fetchCountries() async throws -> [Country] {
+    public init(decoder: JSONDecoder = .init(), urlSession: URLSession = .shared) {
+        self.decoder = decoder
+        self.urlSession = urlSession
+    }
+
+    public func fetchCountries() async throws -> [Country] {
         guard let url = RemoteApiClient.url else { throw ApiError.invalidConfiguration }
 
         do {
-            let data = try await URLSession.shared.data(from: url).0
+            let data = try await urlSession.data(from: url).0
             let countries = try decoder.decode([FailableDecodableWrapper<Country>].self, from: data)
 
             return countries.compactMap { $0.wrappedValue }

@@ -12,7 +12,7 @@ struct CountryListItemViewModel: Identifiable {
     
     var id: String { country.name }
 
-    var title: String { [country.flag, country.name].joined(separator: " ") }
+    var title: String { [country.flag, country.name].compactMap(\.self).joined(separator: " ") }
     var subTitle: String { country.capitals.joined(separator: ", ") }
 
     private let country: Country

@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct Country {
+public struct Country: Sendable {
 
     public let name: String
-    public let flag: String
+    public let flag: String?
     public let capitals: [String]
     public let flagUrl: URL
     public let languages: [String]
@@ -21,7 +21,7 @@ public struct Country {
 
     public init(
         name: String,
-        flag: String,
+        flag: String?,
         capitals: [String],
         flagUrl: URL,
         languages: [String],
@@ -41,7 +41,7 @@ public struct Country {
         self.continents = continents
     }
 
-    public struct Coordinates {
+    public struct Coordinates: Sendable {
         public let latitude: Double
         public let longitude: Double
 
@@ -87,14 +87,14 @@ extension Country: Decodable {
         let flagUrlsContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .flags)
         self.flagUrl = try flagUrlsContainer.decode(URL.self, forKey: .png)
 
-        self.flag = try container.decode(String.self, forKey: .flag)
-        self.capitals = try container.decode([String].self, forKey: .capital)
+        self.flag = try container.decodeIfPresent(String.self, forKey: .flag)
+        self.capitals = try container.decodeIfPresent([String].self, forKey: .capital) ?? []
         self.coordinates = try container.decode(Coordinates.self, forKey: .coordinates)
 
-        let languages = try container.decode([String: String].self, forKey: .languages)
+        let languages = try container.decodeIfPresent([String: String].self, forKey: .languages) ?? [:]
         self.languages = languages.map { $0.value }.sorted()
 
-        self.borders = try container.decode([String].self, forKey: .borders)
+        self.borders = try container.decodeIfPresent([String].self, forKey: .borders) ?? []
         self.population = try container.decode(Int.self, forKey: .population)
         self.continents = try container.decode([String].self, forKey: .continents)
     }
@@ -115,4 +115,10 @@ extension Country.Coordinates: Decodable {
         self.latitude = values[0]
         self.longitude = values[1]
     }
+}
+
+extension Country.Coordinates: Hashable {
+}
+
+extension Country: Hashable {
 }

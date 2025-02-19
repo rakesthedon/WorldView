@@ -9,16 +9,16 @@ import SwiftUI
 import WorldViewCoreKit
 import MapKit
 
-struct CountryDetailsView: View {
+public struct CountryDetailsView: View {
 
     @State var viewModel: CountryDetailsViewModel
 
-    init?(viewModel: CountryDetailsViewModel?) {
+    public init?(viewModel: CountryDetailsViewModel?) {
         guard let viewModel else { return nil }
         self.viewModel = viewModel
     }
 
-    var body: some View {
+    public var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 24) {
                 flag
@@ -84,15 +84,15 @@ private struct SectionShapeModifier: ViewModifier {
         return content.clipShape(RoundedRectangle(cornerRadius: 22))
     }
 }
-
-#Preview {
-    CountryDetailsView(viewModel: .init(country: PreviewCountries.france, formatter: PopulationCountFormatter()))
-}
-
-#Preview {
-    CountryDetailsView(viewModel: .init(country: PreviewCountries.canada, formatter: PopulationCountFormatter()))
-}
-
-#Preview {
-    CountryDetailsView(viewModel: .init(country: PreviewCountries.southAfrica, formatter: PopulationCountFormatter()))
-}
+//
+//#Preview {
+//    CountryDetailsView(viewModel: .init(country: PreviewCountries.france, formatter: PopulationCountFormatter()))
+//}
+//
+//#Preview {
+//    CountryDetailsView(viewModel: .init(country: PreviewCountries.canada, formatter: PopulationCountFormatter()))
+//}
+//
+//#Preview {
+//    CountryDetailsView(viewModel: .init(country: PreviewCountries.southAfrica, formatter: PopulationCountFormatter()))
+//}

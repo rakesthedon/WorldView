@@ -13,7 +13,7 @@ import MapKit
 import SwiftUI
 
 @Observable
-final class CountryDetailsViewModel {
+public final class CountryDetailsViewModel {
 
     struct State {
         var region: CLCircularRegion?
@@ -46,7 +46,7 @@ final class CountryDetailsViewModel {
     private var flagCancellable: AnyCancellable?
     private let formatter: PopulationCountFormatter
 
-    init(
+    public init(
         name: String,
         capitals: String?,
         flagUrl: URL,
@@ -71,7 +71,7 @@ final class CountryDetailsViewModel {
         self.formatter = formatter
     }
 
-    convenience init?(country: Country?, formatter: PopulationCountFormatter) {
+    public convenience init?(country: Country?, formatter: PopulationCountFormatter) {
         guard let country else { return nil }
 
         self.init(

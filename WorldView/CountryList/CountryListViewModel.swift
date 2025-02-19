@@ -8,12 +8,27 @@
 import Foundation
 import WorldViewCoreKit
 import WorldViewApiClient
+import SwiftUI
 
+@Observable
 final class CountryListViewModel: ObservableObject {
 
-    @Published var search: String = ""
+    enum NavigationPath: Hashable {
+        case detail(country: Country)
+    }
+
+    enum LoadingState {
+        case loading
+        case loaded(countries: [Country])
+        case searching(filteredCountries: [Country], countries: [Country])
+        case failed(Error)
+    }
+
+    private(set) var search: String = ""
 
     var filteredCountryList: [Country] {
+        guard case .loaded(let countries) = loadingState else { return [] }
+
         let searchTerm = search.trimmingCharacters(in: .whitespacesAndNewlines)
         return searchTerm.isEmpty ?
         countries :
@@ -25,23 +40,35 @@ final class CountryListViewModel: ObservableObject {
         }
     }
 
-    @Published private(set) var loading: Bool = true
-    @Published private(set) var countries: [Country]
-    @Published private(set) var error: Error?
+    var navigationStackPaths: [NavigationPath] = []
+
+    private(set) var loadingState: LoadingState = .loading
 
     private let client: any ApiClient
     private let formatter: PopulationCountFormatter
 
-    init(countries: [Country] = [], apiClient: any ApiClient, formatter: PopulationCountFormatter = .init()) {
-        self.countries = countries
+    private var loadedCountries : [Country] {
+        switch loadingState {
+        case .loading, .failed: []
+        case .loaded(let countries), .searching(_, let countries): countries
+        }
+    }
+
+    init(
+        countries: [Country] = [],
+        apiClient: any ApiClient,
+        formatter: PopulationCountFormatter = .init()
+    ) {
+        if !countries.isEmpty {
+            loadingState = .loaded(countries: countries)
+        }
+
         self.client = apiClient
         self.formatter = formatter
     }
 
     func fetchCountries() async {
-        await startLoading()
         await performRequest()
-        await endLoading()
     }
 
     func viewModel(for country: Country?) -> CountryListItemViewModel? {
@@ -52,7 +79,33 @@ final class CountryListViewModel: ObservableObject {
         return CountryDetailsViewModel(country: country, formatter: formatter)
     }
 
+    func updateSearch(text: String) {
+        guard loadedCountries.isEmpty == false else { return }
+
+        let searchTerm = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if searchTerm.isEmpty {
+            self.loadingState = .loaded(countries: loadedCountries)
+            self.search = searchTerm
+            return
+        }
+
+        let filteredCountries = loadedCountries.filter { country in
+            country.name.localizedCaseInsensitiveContains(searchTerm) ||
+            country.capitals.contains { capital in
+                capital.localizedCaseInsensitiveContains(searchTerm)
+            }
+        }
+
+        self.set(filteredCountries: filteredCountries, countries: loadedCountries, searchText: text)
+    }
+
+    func didSelect(country: Country) {
+        navigationStackPaths.append(.detail(country: country))
+    }
+
     private func performRequest() async {
+        await startLoading()
         do {
             let countries = try await client.fetchCountries()
             await set(countries: countries.sorted(by: { first, second in
@@ -63,21 +116,26 @@ final class CountryListViewModel: ObservableObject {
         }
     }
 
+
+
     @MainActor private func startLoading() {
-        error = nil
-        loading = true
+        loadingState = .loading
     }
 
     @MainActor private func set(countries: [Country]) {
-        self.countries = countries
+        withAnimation {
+            loadingState = .loaded(countries: countries)
+        }
+    }
+
+    func set(filteredCountries: [Country], countries: [Country], searchText: String) {
+        withAnimation {
+            self.search = searchText
+            loadingState = .searching(filteredCountries: filteredCountries, countries: countries)
+        }
     }
 
     @MainActor private func handle(error: Error) {
-        self.error = error
-        // TODO: Log Error Here
-    }
-
-    @MainActor private func endLoading() {
-        loading = false
+        loadingState = .failed(error)
     }
 }

@@ -6,13 +6,25 @@
 //
 
 import SwiftUI
+import WorldViewApiClient
 import WorldViewCoreKit
 
 @main
 struct WorldViewApp: App {
+
+    @State var countryListViewModel: CountryListViewModel = CountryListViewModel(apiClient: RemoteApiClient(), formatter: PopulationCountFormatter())
+
     var body: some Scene {
         WindowGroup {
-            CountryList(viewModel: .init(apiClient: RemoteApiClient(), formatter: PopulationCountFormatter()))
+            NavigationStack(path: $countryListViewModel.navigationStackPaths) {
+                CountryList(viewModel: countryListViewModel)
+                    .navigationDestination(for: CountryListViewModel.NavigationPath.self) { path in
+                        switch path {
+                        case .detail(let country):
+                            CountryDetailsView(viewModel: countryListViewModel.detailViewModel(for: country))
+                        }
+                    }
+            }
         }
     }
 }

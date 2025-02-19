@@ -10,43 +10,31 @@ import WorldViewCoreKit
 
 struct CountryList: View {
 
-    @ObservedObject var viewModel: CountryListViewModel
+    @State var viewModel: CountryListViewModel
     @State var selectedCountry: Country?
 
     var body: some View {
-        NavigationView {
-            if viewModel.loading {
-                loadingIndicator
-            } else if viewModel.error != nil {
-                emptyStateView(title: "An Unknow Error has occured", message: "We were unable to get the country list. You can always try to reload it.")
-            } else {
-                countryList
-            }
-        }
-        .task {
-            await viewModel.fetchCountries()
-        }
+        content
+            .searchable(text: .init(get: {
+                viewModel.search
+            }, set: {
+                viewModel.updateSearch(text: $0)
+            }))
+            .navigationTitle("Contry List")
     }
 
     @ViewBuilder
-    private var countryList: some View {
-        if viewModel.countries.isEmpty {
-            emptyStateView(title: "Nothing to see here", message: "Looks like the list is empty. You can try to reload the page later.")
-        } else {
-            list
+    private var content: some View {
+        switch viewModel.loadingState {
+        case .loading:
+            loadingIndicator
+        case let .loaded(countries):
+            list(for: countries)
+        case let .searching(filteredCountries, _):
+            list(for: filteredCountries)
+        case .failed:
+            emptyStateView(title: "An Unknow Error has occured", message: "We were unable to get the country list. You can always try to reload it.")
         }
-    }
-
-    private var list: some View {
-        List(viewModel.filteredCountryList) { country in
-            NavigationLink {
-                CountryDetailsView(viewModel: viewModel.detailViewModel(for: country))
-            } label: {
-                CountryListItemView(viewModel: viewModel.viewModel(for: country))
-            }
-        }
-        .navigationTitle("Contry List")
-        .searchable(text: $viewModel.search)
     }
 
     private func emptyStateView(title: String, message: String) -> some View {
@@ -78,6 +66,19 @@ struct CountryList: View {
             Text("Loading in progress")
                 .foregroundStyle(.secondary)
         }
+        .task {
+            await viewModel.fetchCountries()
+        }
+    }
+
+    @ViewBuilder
+    private func list(for countries: [Country]) -> some View {
+        List(countries) { country in
+            Button { viewModel.didSelect(country: country) } label: {
+                CountryListItemView(viewModel: viewModel.viewModel(for: country))
+            }
+            .foregroundStyle(.primary)
+        }
     }
 }
 
@@ -88,7 +89,6 @@ struct CountryList: View {
 #Preview {
     CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(countries: [])))
 }
-
 
 #Preview {
     CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(delay: 3600)))

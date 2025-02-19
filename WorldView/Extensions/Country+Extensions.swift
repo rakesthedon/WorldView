@@ -9,7 +9,7 @@ import Foundation
 import WorldViewCoreKit
 
 
-extension Country: Identifiable {
+extension Country: @retroactive Identifiable {
 
     public var id: String { name }
 }
