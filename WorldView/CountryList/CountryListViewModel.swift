@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import CountryDataSource
+import CountryListUseCase
 import WorldViewCoreKit
-import WorldViewApiClient
 import SwiftUI
 
 @Observable
@@ -44,7 +45,7 @@ final class CountryListViewModel: ObservableObject {
 
     private(set) var loadingState: LoadingState = .loading
 
-    private let client: any ApiClient
+    private let useCase: any CountryListUseCaseProtocol
     private let formatter: PopulationCountFormatter
 
     private var loadedCountries : [Country] {
@@ -56,14 +57,14 @@ final class CountryListViewModel: ObservableObject {
 
     init(
         countries: [Country] = [],
-        apiClient: any ApiClient,
+        useCase: any CountryListUseCaseProtocol,
         formatter: PopulationCountFormatter = .init()
     ) {
         if !countries.isEmpty {
             loadingState = .loaded(countries: countries)
         }
 
-        self.client = apiClient
+        self.useCase = useCase
         self.formatter = formatter
     }
 
@@ -107,10 +108,8 @@ final class CountryListViewModel: ObservableObject {
     private func performRequest() async {
         await startLoading()
         do {
-            let countries = try await client.fetchCountries()
-            await set(countries: countries.sorted(by: { first, second in
-                first.name.compare(second.name) == .orderedAscending
-            }))
+            let countries = try await useCase.getCountries()
+            await set(countries: countries)
         } catch {
             await handle(error: error)
         }

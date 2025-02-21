@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CountryListUseCase
 import WorldViewCoreKit
 
 struct CountryList: View {
@@ -83,17 +84,17 @@ struct CountryList: View {
 }
 
 #Preview {
-    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient()))
+    CountryList(viewModel: CountryListViewModel(useCase: CountryListUseCase(dataSource:  CountriesPreviewDataSource())))
 }
 
 #Preview {
-    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(countries: [])))
+    CountryList(viewModel: CountryListViewModel(useCase: CountryListUseCase(dataSource: CountriesPreviewDataSource(countries: []))))
 }
 
 #Preview {
-    CountryList(viewModel: CountryListViewModel(apiClient: CountriesPreviewApiClient(delay: 3600)))
+    CountryList(viewModel: CountryListViewModel(useCase: CountryListUseCase(dataSource: CountriesPreviewDataSource(delay: 3600))))
 }
 
 #Preview {
-    CountryList(viewModel: CountryListViewModel(apiClient: ForcedFailureApiClient(error: .decodingFailed)))
+    CountryList(viewModel: CountryListViewModel(useCase: CountryListUseCase(dataSource: ForcedFailureApiClient(error: .decodingFailed))))
 }

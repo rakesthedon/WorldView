@@ -5,13 +5,15 @@ import PackageDescription
 
 enum Target: CaseIterable {
     case countryDetail
-    case worldViewApiClient
+    case countryListUseCase
     case worldViewCoreKit
+    case countryDataSource
 
     var name: String {
         switch self {
+        case .countryDataSource: "CountryDataSource"
         case .countryDetail: "CountryDetail"
-        case .worldViewApiClient: "WorldViewApiClient"
+        case .countryListUseCase: "CountryListUseCase"
         case .worldViewCoreKit: "WorldViewCoreKit"
         }
     }
@@ -21,8 +23,11 @@ enum Target: CaseIterable {
 
     var dependencies: [PackageDescription.Target.Dependency] {
         switch self {
+        case .countryDataSource: [.dependency(for: .worldViewCoreKit)]
         case .countryDetail: [.dependency(for: .worldViewCoreKit)]
-        case .worldViewApiClient: [.dependency(for: .worldViewCoreKit)]
+        case .countryListUseCase: [
+            .dependency(for: .countryDataSource),
+            .dependency(for: .worldViewCoreKit)]
         case .worldViewCoreKit: []
         }
     }

@@ -8,8 +8,8 @@
 import Foundation
 import WorldViewCoreKit
 
-public protocol ApiClient: AnyObject {
-    func fetchCountries() async throws -> [Country]
+public protocol CountryDataSource: AnyObject {
+    func getCountries() async throws -> [Country]
 }
 
 public enum ApiError: Error, Equatable {

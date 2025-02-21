@@ -1,13 +1,13 @@
 //
-//  CountriesPreviewApiClient.swift
+//  CountriesPreviewDataSource.swift
 //  WorldView
 //
 //  Created by Yannick Jacques on 2024-05-28.
 //
 
+import CountryDataSource
 import Foundation
 import WorldViewCoreKit
-import WorldViewApiClient
 
 enum PreviewCountries {
     static var canada: Country { .init(name: "Canada", flag: "🇨🇦", capitals: ["Ottawa"], flagUrl: URL(string: "https://flagcdn.com/w320/ca.png")!,
@@ -22,7 +22,7 @@ enum PreviewCountries {
                                             population: 59308690, continents: ["Africa"]) }
 }
 
-final class CountriesPreviewApiClient: ApiClient {
+final class CountriesPreviewDataSource: CountryDataSource {
 
     static var defaultCountries: [Country] {
         [
@@ -36,18 +36,18 @@ final class CountriesPreviewApiClient: ApiClient {
 
     private let delay: TimeInterval
 
-    init(countries: [Country] = CountriesPreviewApiClient.defaultCountries, delay: TimeInterval = 0) {
+    init(countries: [Country] = CountriesPreviewDataSource.defaultCountries, delay: TimeInterval = 0) {
         self.countries = countries
         self.delay = delay
     }
 
-    func fetchCountries() async throws -> [Country] {
+    func getCountries() async throws -> [Country] {
         try? await Task.sleep(for: .seconds(delay))
         return countries
     }
 }
 
-final class ForcedFailureApiClient: ApiClient {
+final class ForcedFailureApiClient: CountryDataSource {
 
     let error: ApiError
 
@@ -55,7 +55,7 @@ final class ForcedFailureApiClient: ApiClient {
         self.error = error
     }
 
-    func fetchCountries() async throws -> [Country] {
+    func getCountries() async throws -> [Country] {
         throw error
     }
 }

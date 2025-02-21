@@ -1,5 +1,5 @@
 //
-//  RemoteApiClient.swift
+//  RemoteCountryDataSource.swift
 //  WorldView
 //
 //  Created by Yannick Jacques on 2024-05-29.
@@ -8,7 +8,7 @@
 import Foundation
 import WorldViewCoreKit
 
-public final class RemoteApiClient: ApiClient {
+public final class RemoteCountryDataSource: CountryDataSource {
 
     static var url: URL? { URL(string: "https://restcountries.com/v3.1/all") }
 
@@ -20,8 +20,8 @@ public final class RemoteApiClient: ApiClient {
         self.urlSession = urlSession
     }
 
-    public func fetchCountries() async throws -> [Country] {
-        guard let url = RemoteApiClient.url else { throw ApiError.invalidConfiguration }
+    public func getCountries() async throws -> [Country] {
+        guard let url = RemoteCountryDataSource.url else { throw ApiError.invalidConfiguration }
 
         do {
             let data = try await urlSession.data(from: url).0

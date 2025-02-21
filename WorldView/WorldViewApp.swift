@@ -5,14 +5,15 @@
 //  Created by Yannick Jacques on 2024-05-28.
 //
 
-import SwiftUI
-import WorldViewApiClient
+import CountryDataSource
+import CountryListUseCase
 import WorldViewCoreKit
+import SwiftUI
 
 @main
 struct WorldViewApp: App {
 
-    @State var countryListViewModel: CountryListViewModel = CountryListViewModel(apiClient: RemoteApiClient(), formatter: PopulationCountFormatter())
+    @State var countryListViewModel: CountryListViewModel = CountryListViewModel(useCase: CountryListUseCase(dataSource: RemoteCountryDataSource()), formatter: PopulationCountFormatter())
 
     var body: some Scene {
         WindowGroup {
